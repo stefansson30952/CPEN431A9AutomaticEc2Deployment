@@ -15,6 +15,10 @@ Go into cdk/bin/cdk-stack.ts and add the RSA key required to access your ec2 ins
 
 ## What was deployed
 
+![Alt text](./images/Architecture.png?raw=true "Architecture")
+
+As you can see in the above photo the following 4 services were deployed in an effort to simplify setup of the ec2 instances, uploading of the jar files to the server and client, running the eval tests and turning off the ec2 instance.
+
 1. One VPC
 2. Two ec2 instances
 3. One lambda function
@@ -36,17 +40,19 @@ Upload all files you want stored on the ec2 instance to the s3 bucket.
 For example the eval client, the assignment jar file, the servers.txt file.
 
 ### Lamba function
-The Lambda function has three variables you need to change:
+The first lambda function startEC2 has three variables you need to change:
 1. The number of nodes you want to deploy
 2. Your secret code
 3. The parameter store secret key name. (You find this in the parameter store tab of AWS and it has the pattern /ec2/keypair/{key_pair_id})
 
-The second Lambda function is used to stop the ec2 instance.
+The second Lambda function is used to stop the ec2 instance and needs to changes.
 
 ### Step function
 The step function is used to start the two lambda functions which start and stop the ec2 instance.
 
 The lambda function assumes the eval client and the assignment.jar are uploaded to the s3 bucket and that the eval client has the word eval in its name.
+
+To start the step function open up the console go to the stepfunction tab and click start on the created step function.
 
 
 ## Additional notes
