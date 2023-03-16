@@ -51,11 +51,11 @@ The second Lambda function is used to stop the ec2 instance and needs to changes
 ### Step function
 The step function is used to start the two lambda functions which start and stop the ec2 instance.
 
-The lambda function assumes the eval client and the assignment.jar are uploaded to the s3 bucket and that the eval client has the word eval in its name.
+The lambda function assumes the eval client and the assignment.jar are uploaded to the s3 bucket and that the eval client has the word eval in its name and the server jar does not have the word eval in its name.
 
 To start the step function open up the console go to the stepfunction tab and click start on the created step function.
 
-## Where to find each deployed solution
+## Where to find each deployed resource
 
 In the search bar type "EC2" and click on the ec2 tab. Then click instances. You will find two ec2 instances deployed named client and server. The EC2 instances will never change private and public IP because two elastic IPs were created when the solution was deployed.
 
@@ -85,3 +85,5 @@ If you search step functions you will see a step function was deployed use this 
 ## Additional notes
 
 The .pem file is storred at /ec2/keypair/{key_pair_id} in parameter store on AWS if you want to ssh on your own into the server
+
+Our server uses a bash script to start 80 nodes called run_servers.sh. I have added the file to the github repo because it is needed to have the code work. If you want to use your own bash script you can put it in the s3 bucket and change line 95 in the ./cdk/lambda/startEC2/index.js to run the correct bash script.
