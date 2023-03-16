@@ -24,6 +24,9 @@ All the AWS services deployed will not cost more than a few cents and will help 
 
 ## What each component does
 
+### VPC
+The vpc is a place to store all your AWS services and is needed to have an ec2 instance
+
 ### ec2 instances
 The two ec2 servers are used to run the eval client
 
@@ -37,6 +40,11 @@ The Lambda function has three variables you need to change:
 1. The number of nodes you want to deploy
 2. Your secret code
 3. The parameter store secret key name. (You find this in the parameter store tab of AWS and it has the pattern /ec2/keypair/{key_pair_id})
+
+The second Lambda function is used to stop the ec2 instance.
+
+### Step function
+The step function is used to start the two lambda functions which start and stop the ec2 instance.
 
 The lambda function assumes the eval client and the assignment.jar are uploaded to the s3 bucket and that the eval client has the word eval in its name.
 

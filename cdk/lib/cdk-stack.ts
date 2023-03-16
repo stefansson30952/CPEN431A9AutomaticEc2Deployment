@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import * as lambda from 'aws-cdk-lib/aws-lambda'
 import * as s3 from 'aws-cdk-lib/aws-s3'
+import { aws_stepfunctions as sfn, Duration} from 'aws-cdk-lib';
+import { aws_stepfunctions_tasks as tasks} from 'aws-cdk-lib';
 import { ArnPrincipal, Effect, ManagedPolicy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class CdkStack extends cdk.Stack {
@@ -185,7 +187,7 @@ export class CdkStack extends cdk.Stack {
       description: 'Contains the simpleSSH library',
     });
 
-    // Create the postgresql db query function.
+    // Create the startEC2 lambda function.
     const startEC2 = new lambda.Function(this, 'startEC2', {
       functionName: "startEC2",
       runtime: lambda.Runtime.NODEJS_16_X,
@@ -209,5 +211,43 @@ export class CdkStack extends cdk.Stack {
       layers: [simpleSSH]
     });
 
+      // Create the startEC2 lambda function.
+    const stopEC2 = new lambda.Function(this, 'stopEC2', {
+      functionName: "stopEC2",
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: 'index.handler',
+      timeout: cdk.Duration.seconds(300),
+      role: lambdaRole,
+      memorySize: 512,
+      securityGroups: [ defaultSecurityGroup ],
+      vpc: vpc,
+      vpcSubnets: {subnetType: ec2.SubnetType.PUBLIC},
+      allowPublicSubnet: true,
+      code: lambda.Code.fromAsset('./lambda/stopEC2/'),
+      environment: {
+        "clientInstanceId": clientEc2.instanceId,
+        "serverInstanceId": serverEc2.instanceId,
+      },
+    });
+
+    const startEC2Invoke = new tasks.LambdaInvoke(this, 'Start DMS Replication', {
+      lambdaFunction: startEC2,
+      outputPath: '$.Payload',
+    });
+    
+    const wait40Minutes = new sfn.Wait(this, 'Wait', {
+      time: sfn.WaitTime.duration(Duration.minutes(40))
+    });
+
+    const stopEC2Invoke = new tasks.LambdaInvoke(this, 'Start DMS Replication', {
+      lambdaFunction: stopEC2,
+      outputPath: '$.Payload',
+    });
+
+    const startStopEc2Definition = startEC2Invoke.next(wait40Minutes).next(stopEC2Invoke)
+
+    const startStopEc2StateMachine = new sfn.StateMachine(this, 'startStopEc2StateMachine', {
+      definition: startStopEc2Definition,
+    });
   }
 }
