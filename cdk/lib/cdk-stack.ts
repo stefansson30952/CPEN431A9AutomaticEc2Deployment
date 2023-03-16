@@ -230,7 +230,7 @@ export class CdkStack extends cdk.Stack {
       },
     });
 
-    const startEC2Invoke = new tasks.LambdaInvoke(this, 'Start DMS Replication', {
+    const startEC2Invoke = new tasks.LambdaInvoke(this, 'startEC2Invoke', {
       lambdaFunction: startEC2,
       outputPath: '$.Payload',
     });
@@ -239,7 +239,7 @@ export class CdkStack extends cdk.Stack {
       time: sfn.WaitTime.duration(Duration.minutes(40))
     });
 
-    const stopEC2Invoke = new tasks.LambdaInvoke(this, 'Start DMS Replication', {
+    const stopEC2Invoke = new tasks.LambdaInvoke(this, 'stopEC2Invoke', {
       lambdaFunction: stopEC2,
       outputPath: '$.Payload',
     });
