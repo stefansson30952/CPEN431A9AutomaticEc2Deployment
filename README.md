@@ -1,6 +1,12 @@
+# The goal of the repo
+
+When testing your CPEN 431 solution you have to run EC2 Instances and a C6A.8Xlarge costs about 1$ an hour.
+To reduce development costs the code in this repo will automatically set up AWS infastructure to automatically start your ec2 instance when you click start on a step function in the AWS console.
+After 40 minutes the same step function will trigger and turn off your ec2 instances.
+
 # How to Deploy the solution
 
-Go into cdk-stack.ts and add the RSA key required to access your ec2 instances
+Go into cdk/bin/cdk-stack.ts and add the RSA key required to access your ec2 instances
 
 1. cd cdk
 2. configure your aws credentials
@@ -9,9 +15,12 @@ Go into cdk-stack.ts and add the RSA key required to access your ec2 instances
 
 ## What was deployed
 
-1. Two ec2 instances
-2. One lambda function
-3. One s3 bucket
+1. One VPC
+2. Two ec2 instances
+3. One lambda function
+4. One s3 bucket
+
+All the AWS services deployed will not cost more than a few cents and will help save money by shutting down ec2 instances
 
 ## What each component does
 
@@ -34,6 +43,4 @@ The lambda function assumes the eval client and the assignment.jar are uploaded 
 
 ## Additional notes
 
-The .pem file is storred at /ec2/keypair/{key_pair_id} in parameter store on AWS
-
-Add layer to cdk for lambda not there yet!
+The .pem file is storred at /ec2/keypair/{key_pair_id} in parameter store on AWS if you want to ssh on your own into the server
